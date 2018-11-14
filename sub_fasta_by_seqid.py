@@ -2,23 +2,20 @@
 '''
     Given seqids, and write the subset sequences in fasta file
 '''
-
+import argparse
 from Bio import SeqIO
-from optparse import OptionParser
 
-parser = OptionParser("usage: %prog fasta_file seqids")
+parser = argparse.ArgumentParser()
+parser.add_argument('infile', help="Fasta file to extract seq from")
+parser.add_argument('seqids', help="A list of geneids, with , to separate")
+args = parser.parse_args()
 
-(options, args) = parser.parse_args()
-
-if len(args) <= 1:
-    parser.error("incorrect number of arguments")
-
-fasta_file = args[0]
-seqids = args[1:]
+fasta_file = args.infile
+seqids = args.seqids.split(",")
 
 with open(fasta_file, 'r') as inh:
     for record in SeqIO.parse(inh, 'fasta'):
-        seqid = record.id.split("|")[0]
+        seqid = record.id
         if seqid in seqids:
             print ">%s" %seqid
             print record.seq
