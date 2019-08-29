@@ -18,7 +18,7 @@ basename, extension = os.path.splitext(gff_file)
 tab_file = basename + ".tab"
 
 with open(gff_file) as gff_fh, open(tab_file, 'w') as outh:
-    print >>outh, "Geneid\tName\tDescription\tChromosome"
+    print >>outh, "Geneid\tName\tLength\tDescription\tChromosome"
     for line in gff_fh:
         line = line.strip()
         if len(line) == 0:
@@ -33,12 +33,15 @@ with open(gff_file) as gff_fh, open(tab_file, 'w') as outh:
         geneid = re.search("ID=(.*?);", infos).groups()[0]
         if geneid.startswith("gene"):
             geneid = geneid.lstrip("gene:")
-        m = re.search("description=(.*?);", infos)
-        description = m.groups()[0] if m else ""
+        if re.search("description=(.*?);", infos):
+            m = re.search("description=(.*?);", infos)
+        else:
+            m = re.search("description=(.*?)$", infos)
+        description = m.groups()[0]
         if re.search("Source", description):
             description = description.split(" [Source")[0]
         name_m = re.search(";Name=(.*?);", infos)
-        name = name_m.groups()[0] if name_m else ""
+        name = name_m.groups()[0] if name_m else geneid
         description = filter_string(description)
         if description.endswith("mRNA."):
             description = re.match("(.*?)\(.*?\).*?, mRNA\.$", description).groups()[0]
@@ -47,5 +50,6 @@ with open(gff_file) as gff_fh, open(tab_file, 'w') as outh:
                 description = re.search("biotype=(.*?);", infos).groups()[0]
             else:
                 description = ""
-
-        print >>outh, "\t".join(map(str, [geneid, name, description, scfid]))
+        
+        size = (int(end) - int(start) + 1) / 3
+        print >>outh, "\t".join(map(str, [geneid, name, size, description, scfid]))

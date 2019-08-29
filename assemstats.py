@@ -36,20 +36,25 @@ def trimLens(lens, minLen):
 
    return lens[index:len(lens)]
 
+def getGC(seq):
+    return sum([1.0 for nucl in seq if nucl in ['G', 'C', 'g', 'c']])
+
 def getLens(filename):
    '''
    Parses FASTA file using screed to create a sorted list of contig lengths.
    '''
    lens = []
+   gcs = []
    fd = open(filename, 'r')
 
    fa_instance = screed.fasta.fasta_iter(fd)
    for record in fa_instance:
       lens.append(len(record['sequence']))
+      gcs.append(getGC(record['sequence']))
 
    fd.close()
 
-   return sorted(lens)
+   return sorted(lens), gcs
 
 def calcNXX(lens, percent):
    '''
@@ -74,6 +79,8 @@ def calcNXX(lens, percent):
 
    return nxx, nxxLen
 
+
+
 def main():
    '''
    Outputs assembly statistics for provided FASTA files.
@@ -92,7 +99,7 @@ def main():
 
    for expr in sys.argv[2:len(sys.argv)]:
       for filename in glob.glob(expr):
-         lens = getLens(filename)
+         lens, gcs = getLens(filename)
          trimmedLens = trimLens(lens, minLen)
 
          if len(trimmedLens) == 0:
@@ -123,5 +130,6 @@ def main():
          print "N75 inclues %d contigs and N75 length: %d" %(statN75, statN75Len)
          print "N80 inclues %d contigs and N80 length: %d" %(statN80, statN80Len)
          print "N90 includes %d contigs and N90 length: %d" %(statN90, statN90Len)
+         print "GC: %.1f" %(sum(gcs)/sum(lens) * 100) 
 
 main()
