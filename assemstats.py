@@ -17,7 +17,7 @@ Author: Jason Pell (pelljaso@cse.msu.edu)
 '''
 
 import screed.fasta
-import sys
+import sys, re
 import glob
 
 def trimLens(lens, minLen):
@@ -44,17 +44,19 @@ def getLens(filename):
    Parses FASTA file using screed to create a sorted list of contig lengths.
    '''
    lens = []
+   lens_without_N = []
    gcs = []
    fd = open(filename, 'r')
 
    fa_instance = screed.fasta.fasta_iter(fd)
    for record in fa_instance:
       lens.append(len(record['sequence']))
+      lens_without_N.append(len(re.sub("N+", "", record['sequence'].upper())))
       gcs.append(getGC(record['sequence']))
 
    fd.close()
 
-   return sorted(lens), gcs
+   return sorted(lens), sorted(lens_without_N), gcs
 
 def calcNXX(lens, percent):
    '''
@@ -99,8 +101,9 @@ def main():
 
    for expr in sys.argv[2:len(sys.argv)]:
       for filename in glob.glob(expr):
-         lens, gcs = getLens(filename)
+         lens, lens_without_N, gcs = getLens(filename)
          trimmedLens = trimLens(lens, minLen)
+         trimmedLens_without_N = trimLens(lens_without_N, minLen)
 
          if len(trimmedLens) == 0:
             print filename + " - no sequences longer than threshold"
@@ -109,6 +112,7 @@ def main():
          statN = len(lens)
          statTrimmedN = len(trimmedLens)
          statSum = sum(trimmedLens)
+         statSum_without_N = sum(trimmedLens_without_N)
          statMin = min(trimmedLens)
          statMax = max(trimmedLens)
          statMed = trimmedLens[(len(trimmedLens)-1)/2]
@@ -122,6 +126,7 @@ def main():
          print "Total number of contigs: %d" %statN
          print "Total number of contigs >= %d: %d" %(minLen, statTrimmedN)
          print "Total bp after trimming: %d" %statSum
+         print "Total bp after trimming without N: %d" %statSum_without_N
          print "Minumum contig length: %d" %statMin
          print "Median contig length: %d" %statMed
          print "Mean contig length: %d" %statMean
