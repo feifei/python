@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys, os, yaml, glob
 import subprocess
 import argparse

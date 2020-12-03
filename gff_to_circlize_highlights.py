@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 '''
     Convert modification sites in gff to circlize highlights
 
@@ -33,4 +35,4 @@ with open(gff_file, 'r') as inh, open (outfile, 'w') as outh:
         elif type == "m6A":
             col = "blue"
         
-        print >>outh, "\t".join([scfid, start, end, col])
+        outh.write("\t".join([scfid, start, end, col]) + '\n')

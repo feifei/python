@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ''' 
     Splitting blast job according to the specified number of threads 
     Only blastp for now

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 '''
     Analyze the ASH level of different genomes
     To have a consistent estimation to compare

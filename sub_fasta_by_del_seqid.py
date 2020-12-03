@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-    Remove given seqs from fasta file,
+    Print given seqs from fasta file,
     sub header to before |
 '''
 import argparse
