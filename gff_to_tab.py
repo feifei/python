@@ -29,6 +29,10 @@ with open(gff_file) as gff_fh, open(tab_file, 'w') as outh:
         scfid, _, type, start, end, score, strand, _, infos = arr
         if not re.search("gene", type):
             continue
+        
+        # Skip all pseudo genes.
+        if re.search("pseudo_true=1", infos):
+            continue
             
         geneid = re.search("ID=(.*?);", infos).groups()[0]
         if geneid.startswith("gene"):
